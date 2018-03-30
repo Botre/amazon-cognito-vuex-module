@@ -182,13 +182,29 @@ export default {
   signUp({ commit, state }, payload) {
     const email = payload.email;
     const password = payload.password;
+    const attributes = [];
+    Object.keys(payload).map((key) => {
+      if(key !== 'password'){
+        if(key === 'custom' && typeof key === 'object'){
+          Object.keys(key).map((customKey) => {
+            attributes.push(new CognitoUserAttribute({
+              Name: `custom:${customKey}`,
+              Value: key[customKey],
+            }));
+          });
+        }else{
+          attributes.push(new CognitoUserAttribute({
+            Name: key,
+            Value: payload[key],
+          }));
+        }
+      }
+    });
+    Object.keys(payload.custom || {}).map(key => new CognitoUserAttribute({
+        Name: `custom:${key}`,
+        Value: payload[key],
+    }));
     return new Promise((resolve, reject) => {
-      const attributes = [
-        new CognitoUserAttribute({
-          Name: 'email',
-          Value: email
-        })
-      ];
       state.pool.signUp(email, password, attributes, null, (error, result) => {
         if (error) {
           reject(error);
