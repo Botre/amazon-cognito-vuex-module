@@ -120,6 +120,10 @@ axios.interceptors.request.use(async config => {
 
 `$store.dispatch('signOut')`
 
+**Refresh token**
+
+`$store.dispatch('refreshToken')`
+
 ## Twitter
 
 [Follow me on Twitter](https://twitter.com/KrolsBjorn)

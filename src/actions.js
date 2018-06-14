@@ -252,5 +252,34 @@ export default {
       user.signOut();
       commit('setAuthenticated', null);
     }
+  },
+  /* Refresh token */
+  refreshToken({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      const user = state.pool.getCurrentUser();
+      if (user != null) {
+        user.getSession(function(error, session) {
+          if (error) {
+            reject(error);
+          } else {
+            const refreshToken = session.getRefreshToken();
+            user.refreshSession(refreshToken, (err, session) => {
+              if (err) {
+                reject(err);
+              } else {
+                try {
+                  commit('setAuthenticated', user);
+                  resolve(session);
+                } catch (e) {
+                  reject(e);
+                }
+              }
+            });
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
   }
 };
